@@ -1,0 +1,13 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: nginx-service
+spec:
+  containers:
+  - name: nginx-service
+    image: nginx
+  tolerations:
+  - key: "app"
+    operator: "Equal"
+    value: "nginx"
+    effect: "NoSchedule"
