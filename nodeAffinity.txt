@@ -1,0 +1,83 @@
+
+Taints:
+
+kubectl taint nodes kslave1 app=nginx:NoSchedule
+
+Above command will taint the node klsave1, i.e it won't allow the pods to schdule in this node
+ 
+Tolleration:
+If we want to schdule the pods in taint node , we need to use tolleration concept. we need to define torrellaration in manifest filein spec section as below, key value pair should match here and all are in double qoutes.
+
+kind: Pod
+apiVersion: v1
+metadata:
+  name: nginx-service
+spec:
+  containers:
+  - name: nginx-service
+    image: nginx
+  tolerations:
+  - key: "app"
+    operator: "Equal"
+    value: "nginx"
+    effect: "NoSchedule"
+
+Un-Taint :
+Use below command for untaint.
+kubectl taint nodes kslave1 app-
+
+
+NodeSelector:
+This is useful to scehdule the pods only on selected nodes.Ths is achived by labeling the nodes
+
+kubectl label nodes naodename key=value
+kubectl label nodes gcp1 color=blue
+
+kind: Pod
+apiVersion: v1
+metadata:
+  name: nginx
+spec:
+  nodeSelector:
+          color: blue
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+above file will run the nginx only on the matchlabel blue.
+
+
+
+NodeAffinity and antiAffinity:
+
+This is another way of describing pods to sechdule on nodes. here we can define mutiple values that matches.
+
+kind: Pod
+apiVersion: v1
+metadata:
+  name: nginx-service-affy
+spec:
+  affinity:
+    nodeAffinity:
+     requiredDuringSchedulingIgnoredDuringExecution:
+       nodeSelectorTerms:
+       - matchExpressions:
+         - key: color
+           operator: In
+           values:
+                   - red
+     preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 1
+        preference:
+          matchExpressions:
+          - key: label-1
+            operator: In
+            values:
+            - key-1
+            - linux
+  containers:
+  - name: nginx-service-affy
+    image: nginx
+    ports:
+    - containerPort: 80
